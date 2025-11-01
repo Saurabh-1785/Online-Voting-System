@@ -1,4 +1,3 @@
-// src/utils/faceEmbedding.ts
 
 /**
  * Extract a 128-dimensional face embedding from a video frame or canvas
