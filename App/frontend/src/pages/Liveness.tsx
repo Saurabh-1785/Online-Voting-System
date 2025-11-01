@@ -37,37 +37,75 @@ const Liveness = () => {
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [navigate]);
+  }, [navigate]); // Removed stream from dependency array
+
+  // FIX 1: Separate useEffect to attach stream to video
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+      
+      videoRef.current.onloadedmetadata = () => {
+        videoRef.current?.play()
+          .then(() => {
+            console.log("✅ Camera feed active");
+            setCameraActive(true);
+          })
+          .catch(err => {
+            console.error("❌ Video play error:", err);
+            toast.error("Failed to start video");
+          });
+      };
+    }
+  }, [stream]);
 
   const startCamera = async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: false,
+        video: { 
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: true, // Changed to true for voice challenge
       });
+      
       setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-      setCameraActive(true);
-      startVerification();
+      console.log("✅ Camera stream obtained");
+      
+      // Don't set cameraActive here - wait for video to actually play
+      // setCameraActive will be set in the useEffect above
+      
     } catch (error) {
+      console.error("❌ Camera error:", error);
       toast.error("Camera access denied. Please enable camera permissions.");
+      setVerificationStatus("failed");
     }
   };
 
+  // FIX 2: Only start verification after camera is actually active
+  useEffect(() => {
+    if (cameraActive && verificationStatus === "idle") {
+      startVerification();
+    }
+  }, [cameraActive]);
+
   const startVerification = () => {
+    console.log("🚀 Starting verification");
     setVerificationStatus("processing");
     setCurrentChallenge(0);
     simulateChallenge(0);
   };
 
   const simulateChallenge = (challengeIndex: number) => {
+    console.log(`Challenge ${challengeIndex + 1} started`);
+    
     // Simulate challenge completion after 4 seconds
     setTimeout(() => {
       const newComplete = [...challengeComplete];
       newComplete[challengeIndex] = true;
       setChallengeComplete(newComplete);
+      
+      console.log(`✓ Challenge ${challengeIndex + 1} completed`);
 
       if (challengeIndex < challenges.length - 1) {
         setCurrentChallenge(challengeIndex + 1);
@@ -80,6 +118,7 @@ const Liveness = () => {
   };
 
   const completeVerification = () => {
+    console.log("✅ All challenges completed");
     setVerificationStatus("success");
     toast.success("Identity verified successfully!");
 
@@ -106,7 +145,10 @@ const Liveness = () => {
     setVerificationStatus("idle");
     setChallengeComplete([false, false, false]);
     setCurrentChallenge(0);
-    startVerification();
+    setCameraActive(false);
+    
+    // Restart camera
+    startCamera();
   };
 
   const handleCancel = () => {
@@ -163,18 +205,27 @@ const Liveness = () => {
 
           <div className="relative">
             <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl">
-              {cameraActive ? (
+              {/* Always show video element, but show loading if not active */}
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className={`w-full aspect-video object-cover ${!cameraActive ? 'hidden' : ''}`}
+              />
+              
+              {!cameraActive ? (
+                <div className="aspect-video flex items-center justify-center bg-black">
+                  <div className="text-center text-white">
+                    <Camera className="h-16 w-16 mx-auto mb-4 opacity-50 animate-pulse" />
+                    <p className="text-lg">Initializing camera...</p>
+                    <p className="text-sm text-muted-foreground mt-2">Please allow camera access</p>
+                  </div>
+                </div>
+              ) : (
                 <>
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full aspect-video object-cover"
-                  />
-                  
                   {/* Face Detection Oval */}
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-96 h-[500px] border-4 border-secondary rounded-[50%] shadow-lg"></div>
                   </div>
 
@@ -204,7 +255,7 @@ const Liveness = () => {
 
                   {/* Challenge Text */}
                   {verificationStatus === "processing" && (
-                    <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-card/95 backdrop-blur-sm px-8 py-4 rounded-xl shadow-xl max-w-lg">
+                    <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-card/95 backdrop-blur-sm px-8 py-4 rounded-xl shadow-xl max-w-lg z-10">
                       <p className="text-xl font-semibold text-center">{challenges[currentChallenge]}</p>
                       <p className="text-sm text-muted-foreground text-center mt-2">
                         Challenge {currentChallenge + 1} of {challenges.length}
@@ -213,7 +264,7 @@ const Liveness = () => {
                   )}
 
                   {/* Checkmarks */}
-                  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4">
+                  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4 z-10">
                     {challengeComplete.map((complete, index) => (
                       <div
                         key={index}
@@ -230,18 +281,11 @@ const Liveness = () => {
                     ))}
                   </div>
                 </>
-              ) : (
-                <div className="aspect-video flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <Camera className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg">Initializing camera...</p>
-                  </div>
-                </div>
               )}
             </div>
 
             {/* Cancel Button */}
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-4 right-4 z-20">
               <Button onClick={handleCancel} variant="destructive" size="sm">
                 Cancel
               </Button>
