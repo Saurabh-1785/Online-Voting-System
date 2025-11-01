@@ -16,7 +16,7 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
               <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-                Secure Online Voting for Indians Abroad
+                Secure Online Voting
               </h1>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                 Vote from anywhere in the world with military-grade security. 
