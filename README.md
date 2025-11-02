@@ -2,9 +2,9 @@
 
 <div align="center">
 
-![Online Voting System](/home/saurabh1785/Online-Voting-System/docs/images/home.png)
-![AI Verification](/home/saurabh1785/Online-Voting-System/docs/images/AI.png)
-![ECI Secure Vote](/home/saurabh1785/Online-Voting-System/docs/images/voting.png)
+![Online Voting System](docs/images/home.png)
+![AI Verification](docs/images/AI.png)
+![ECI Secure Vote](docs/images/voting.png)
 
 **Secure, Anonymous, and Verifiable Online Voting Platform**
 
@@ -418,17 +418,12 @@ npm run dev
 cd App/frontend
 npm run dev
 
-# Terminal 3: Start AI Service (if separate)
-cd App/ai-service
-python3 app.py
-```
 
 #### 7. Access Application
 
 ```
 Frontend: http://localhost:8080
 Backend API: http://localhost:3000
-API Docs: http://localhost:3000/api-docs
 ```
 
 ---
