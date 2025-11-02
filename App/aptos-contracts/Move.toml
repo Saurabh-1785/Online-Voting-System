@@ -5,7 +5,7 @@ authors = ["Election Commission of India <tech@eci.gov.in>"]
 
 [addresses]
 # This is your named address — replace with your real one
-voting = "0x96adc44d57ca89664555fdee547c6a332131f13b01e254c868ff6ad9ee950299"
+voting = "0xed1e2e5167d3d6aeae46127077ba7ecd7a8eaf85da06113ce4fdabe057b755e7"
 std = "0x1"
 
 [dependencies]

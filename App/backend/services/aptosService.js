@@ -40,13 +40,30 @@ class AptosService {
    * Create transaction payload
    */
   createPayload(functionName, typeArgs = [], args = []) {
-    return new TxnBuilderTypes.TransactionPayloadEntryFunction(
-      TxnBuilderTypes.EntryFunction.natural(
-        `${MODULE_ADDRESS}::${functionName}`,
-        typeArgs,
-        args
-      )
-    );
+    // Expect functionName in the form "module_name::function_name"
+    // EntryFunction.natural expects (module_id_string, function_name, type_args, args)
+    try {
+      const parts = functionName.split('::');
+      if (parts.length !== 2) {
+        throw new Error('functionName must be in the form "module::function"');
+      }
+      const moduleName = parts[0];
+      const fnName = parts[1];
+
+      const moduleId = `${MODULE_ADDRESS}::${moduleName}`;
+
+      return new TxnBuilderTypes.TransactionPayloadEntryFunction(
+        TxnBuilderTypes.EntryFunction.natural(
+          moduleId,
+          fnName,
+          typeArgs,
+          args
+        )
+      );
+    } catch (err) {
+      console.error('createPayload error:', err.message);
+      throw err;
+    }
   }
 
   /**

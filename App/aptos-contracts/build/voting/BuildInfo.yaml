@@ -11,8 +11,8 @@ compiled_package_info:
     std: "0000000000000000000000000000000000000000000000000000000000000001"
     vm: "0000000000000000000000000000000000000000000000000000000000000000"
     vm_reserved: "0000000000000000000000000000000000000000000000000000000000000000"
-    voting: 96adc44d57ca89664555fdee547c6a332131f13b01e254c868ff6ad9ee950299
-  source_digest: 2B977F970524CD7137EFFB95B95DD7A49E9F7478437CC98709D72B24A48DE211
+    voting: ed1e2e5167d3d6aeae46127077ba7ecd7a8eaf85da06113ce4fdabe057b755e7
+  source_digest: 3C131A239B00569941C165A85D201C9C81CC9129B40ACD63D4A4A247BF39B023
   build_flags:
     dev_mode: false
     test_mode: false
@@ -24,7 +24,7 @@ compiled_package_info:
     install_dir: ~
     force_recompilation: false
     additional_named_addresses:
-      voting: 96adc44d57ca89664555fdee547c6a332131f13b01e254c868ff6ad9ee950299
+      voting: ed1e2e5167d3d6aeae46127077ba7ecd7a8eaf85da06113ce4fdabe057b755e7
     fetch_deps_only: false
     skip_fetch_latest_git_deps: false
     compiler_config:
